@@ -3,223 +3,233 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Merry Christmas 2025</title>
-    <link href="fonts.googleapis.com" rel="stylesheet">
+    <title>Giáng Sinh Đặc Biệt 2025</title>
     <style>
-        :root { --bg-color: #061d12; }
-        body {
-            margin: 0; padding: 0; background: var(--bg-color); color: white;
-            font-family: 'Mountains of Christmas', cursive; overflow: hidden;
-            display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; text-align: center;
+        :root {
+            --snow-white: #ffffff;
+            --xmas-red: #d63031;
+            --xmas-green: #27ae60;
         }
-        canvas#effect-canvas { position: fixed; top: 0; left: 0; pointer-events: none; z-index: 100; }
-        .decoration { position: fixed; font-size: 60px; z-index: -1; }
-        .santa { top: 20px; left: 20px; }
-        .snowman { bottom: 20px; right: 20px; }
 
-        .gift-container { display: flex; gap: 20px; justify-content: center; }
-        .gift-box {
-            width: 130px; height: 130px; display: flex; align-items: center; justify-content: center;
-            border-radius: 15px; font-size: 40px; cursor: pointer; border: 4px solid white;
-            box-shadow: 0 0 15px rgba(255,255,255,0.3); animation: bounce 1.5s infinite;
-            flex-direction: column;
+        body {
+            margin: 0; padding: 0;
+            font-family: 'Arial', sans-serif;
+            background-color: var(--snow-white);
+            overflow: hidden;
+            display: flex; justify-content: center; align-items: center;
+            height: 100vh;
         }
-        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-        
-        .quiz-container { background: rgba(255, 255, 255, 0.95); padding: 25px; border-radius: 20px; color: #d42426; max-width: 600px; width: 90%; box-shadow: 0 0 30px gold; z-index: 10; }
-        .btn-ans {
-            display: block; width: 100%; padding: 10px; margin: 8px 0;
-            background: #2e7d32; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 18px;
-            text-align: left; padding-left: 15px; transition: 0.2s;
+
+        /* Đèn nhấp nháy */
+        .lights {
+            position: fixed; top: 0; width: 100%; height: 15px;
+            background: radial-gradient(circle, #ff0 5px, transparent 5px);
+            background-size: 30px 30px;
+            animation: flash 0.5s infinite alternate;
+            z-index: 1000; display: none;
         }
-        .btn-ans:hover { background: #d42426; }
-        .hidden { display: none !important; }
-        
-        #final-msg { 
-            background: rgba(0, 0, 0, 0.7); padding: 20px; border-radius: 15px; 
-            max-width: 80%; line-height: 1.6; font-size: 24px; color: #ffeb3b;
-            border: 2px solid gold; animation: zoomIn 1s;
+        @keyframes flash { from { opacity: 1; } to { opacity: 0.3; } }
+
+        /* Màn hình khởi đầu */
+        #start-screen { text-align: center; cursor: pointer; z-index: 2000; }
+        #big-tree { font-size: 200px; animation: sway 2s infinite ease-in-out; }
+        @keyframes sway { 
+            0%, 100% { transform: rotate(-5deg); } 
+            50% { transform: rotate(5deg); } 
         }
-        @keyframes zoomIn { from { transform: scale(0); } to { transform: scale(1); } }
+
+        /* Khung câu hỏi */
+        #quiz-container {
+            display: none;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px; border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            max-width: 550px; width: 90%;
+            text-align: center; z-index: 100;
+            border: 6px double var(--xmas-red);
+            position: relative;
+        }
+
+        .question { font-size: 1.2rem; font-weight: bold; margin-bottom: 20px; color: #2d3436; }
+        .options-grid { display: grid; gap: 10px; }
+        .option {
+            padding: 12px; border: 2px solid var(--xmas-green);
+            background: white; border-radius: 8px; cursor: pointer;
+            font-size: 1rem; transition: 0.2s;
+        }
+        .option:hover { background: var(--xmas-green); color: white; }
+
+        /* Nút Tiếp tục ở góc phải */
+        #next-btn {
+            display: none;
+            position: absolute; bottom: 20px; right: 20px;
+            padding: 10px 20px; background: var(--xmas-red);
+            color: white; border: none; border-radius: 50px;
+            cursor: pointer; font-weight: bold; font-size: 1rem;
+            box-shadow: 0 4px 15px rgba(214, 48, 49, 0.4);
+            z-index: 101;
+        }
+
+        /* Video toàn màn hình */
+        #video-overlay {
+            display: none; position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%; background: black;
+            z-index: 5000; justify-content: center; align-items: center;
+        }
+        video { width: 100%; height: 100%; object-fit: contain; }
+
+        /* Hiệu ứng tuyết và kẹo */
+        .snowflake, .candy {
+            position: fixed; top: -10%; z-index: 1;
+            animation: fall linear infinite; pointer-events: none;
+        }
+        @keyframes fall { to { transform: translateY(110vh) rotate(360deg); } }
+
+        .decor { position: fixed; bottom: 0; font-size: 100px; z-index: 5; display: none; }
+        #santa { left: 20px; }
+        #snowman { right: 20px; }
+        #message { color: var(--xmas-red); font-weight: bold; margin-top: 15px; height: 20px; }
     </style>
 </head>
 <body>
-    <canvas id="effect-canvas"></canvas>
-    <div class="decoration santa">🎅</div>
-    <div class="decoration snowman">☃️</div>
 
-    <h1 id="title">Chọn hộp quà nhạc để bắt đầu!</h1>
+<div class="lights" id="lights"></div>
 
-    <!-- BƯỚC 1: SẢNH CHỌN NHẠC -->
-    <div id="step1" class="gift-container">
-        <div class="gift-box" style="background: #e53935;" onclick="startApp('jingle.mp3')">🎁<br><small style="font-size:12px">Jingle</small></div>
-        <div class="gift-box" style="background: #1e88e5;" onclick="startApp('phonk.mp3')">🎁<br><small style="font-size:12px">Phonk</small></div>
-        <div class="gift-box" style="background: #ffeb3b; color: black;" onclick="startApp('reallife.mp3')">🎁<br><small style="font-size:12px">Real Life</small></div>
+<div id="start-screen" onclick="startQuiz()">
+    <div id="big-tree">🎄</div>
+    <h1 style="color: var(--xmas-green); text-shadow: 2px 2px white;">BẤM VÀO CÂY THÔNG ĐỂ BẮT ĐẦU!</h1>
+</div>
+
+<div id="quiz-container">
+    <div style="font-size: 50px;">🎄</div>
+    <div id="quiz-content">
+        <div id="q-text" class="question"></div>
+        <div id="options" class="options-grid"></div>
+        <div id="message"></div>
     </div>
+    <button id="next-btn" onclick="playVideo()">Tiếp tục ➔</button>
+</div>
 
-    <!-- BƯỚC 2: CÂY THÔNG -->
-    <div id="step-tree" class="hidden">
-        <div style="font-size: 150px; cursor: pointer;" onclick="showQuiz()">🎄</div>
-        <h2>BẤM VÀO CÂY THÔNG ĐỂ THỬ THÁCH!</h2>
-    </div>
+<!-- Video Overlay -->
+<div id="video-overlay">
+    <video id="noel-video" controls>
+        <source src="noel.mp4" type="video/mp4">
+        Trình duyệt của bạn không hỗ trợ video.
+    </video>
+</div>
 
-    <!-- BƯỚC 3: CÂU HỎI -->
-    <div id="step-quiz" class="hidden">
-        <div class="quiz-container">
-            <p id="quiz-info" style="font-weight: bold; color: #555;"></p>
-            <h2 id="quiz-question" style="font-size: 20px;"></h2>
-            <button class="btn-ans" id="ans-a" onclick="check('a')"></button>
-            <button class="btn-ans" id="ans-b" onclick="check('b')"></button>
-            <button class="btn-ans" id="ans-c" onclick="check('c')"></button>
-            <button class="btn-ans" id="ans-d" onclick="check('d')"></button>
-        </div>
-    </div>
+<div id="santa" class="decor">🎅</div>
+<div id="snowman" class="decor">☃️</div>
 
-    <!-- MÀN HÌNH CUỐI -->
-    <div id="final-screen" class="hidden">
-        <div id="final-msg">
-            Chúc mừng bạn đã thành công xuất sắc vượt qua 15 câu hỏi (mình đoán là bạn cũng đã tra ChatGPT,.. hoặc là đã làm lại vài lần rồi nhưng thôi kệ đi) <br><br>
-            Mình chúc bạn một mùa Giáng Sinh an lành <br>
-            <strong style="font-size: 40px;">MERRY CHRISMASSSS !!!</strong>
-        </div>
-        <div style="font-size: 100px; margin-top: 20px;">🐄</div>
-    </div>
+<audio id="bg-music" src="isyou.mp3" loop></audio>
 
-    <audio id="bg-music" loop></audio>
+<script>
+    const questions = [
+        { q: "Loại thịt nào là phổ biến nhất trong dịp Giáng Sinh?", a: ["Gà tây", "Bò bít tết", "Lợn hun khói", "Gà nướng"], c: 0 },
+        { q: "Ông già Noel vào nhà bằng cách nào?", a: ["Bấm chuông", "Cửa sổ", "Chui qua ống khói", "Gửi bưu điện"], c: 2 },
+        { q: "Bộ phim nào liên quan đến Giáng Sinh?", a: ["Home alone", "Avatar", "Despicable me", "Zootopia"], c: 0 },
+        { q: "Túi đựng quà cho trẻ em là gì?", a: ["Túi HDPE", "Chiếc tất", "Hộp giấy", "Chiếc mũ len"], c: 1 },
+        { q: "Ông già Noel tên thật là gì?", a: ["Jack Frost", "Easter Bunny", "Santa Claus", "Uncle Sam"], c: 2 },
+        { q: "Góc nội tiếp chắn nửa đường tròn có số đo là?", a: ["90°", "45°", "180°", "60°"], c: 0 },
+        { q: "Khẳng định nào SAI về góc nội tiếp?", a: ["Hai cạnh chứa dây cung", "Đỉnh trên đường tròn", "Luôn bằng 90 độ", "Bằng nửa cung bị chắn"], c: 2 },
+        { q: "Nếu Delta < 0 phương trình bậc hai sẽ?", a: ["Vô số nghiệm", "Hai nghiệm", "Vô nghiệm", "Nghiệm kép"], c: 2 },
+        { q: "Ai là tác giả 'Chuyện người con gái Nam Xương'?", a: ["Nguyễn Trãi", "Nguyễn Dữ", "Nguyễn Du", "Đoàn Thị Điểm"], c: 1 },
+        { q: "Hai gia tộc trong 'Romeo và Juliet' có mối thù là?", a: ["Montague và Capulet", "Stark & Lannister", "Medici & Borgia", "Hamlet & Ophelia"], c: 0 },
+        { q: "Bài thơ nào KHÔNG có trong Ngữ văn 9 Tập 1 (KNTT)?", a: ["Thằng quỷ nhỏ", "Nỗi oán sầu...", "Tự tình 2", "Ngày xưa"], c: 0 },
+        { q: "Chất nào sau đây là Alkene?", a: ["CH3-CH2=CH2", "CH2=CH=CH2", "CH3-CH=CH-CH3", "CH=CH3-CH3"], c: 2 },
+        { q: "Công thức chung của Carbohydrate?", a: ["Cn(HO)m", "Cn(HOHO)m", "Cn(H2O2)m", "Cn(H2O)m"], c: 3 },
+        { q: "Ứng dụng nào KHÔNG phải của ethylic alcohol?", a: ["Nhiên liệu", "Sát khuẩn", "Không có đáp án đúng", "Đồ uống"], c: 2 },
+        { q: "F là kí hiệu của gì trong Sinh Học?", a: ["Thế hệ con", "Cặp bố mẹ", "Giao tử", "Phép lai"], c: 0 },
+        { q: "Nguyên tử cấu tạo nên Nucleic acid?", a: ["C P N O H", "C O H N K", "N H G O C", "B A O D Z"], c: 0 },
+        { q: "Loài động vật nào có bộ NST 2n=46?", a: ["Người", "Tinh tinh", "Gà", "Ruồi giấm"], c: 0 },
+        { q: "Điền từ: They ________ this movie three times already.", a: ["have seen", "saw", "have see", "has seen"], c: 0 },
+        { q: "The company's profits have ________ steadily...", a: ["risen", "increased", "lifted", "raised"], c: 0 },
+        { q: "Nhúng thấu kính lồi vào chất lỏng có chiết suất lớn hơn thủy tinh?", a: ["Hội tụ", "Phân kỳ", "Tấm thủy tinh", "Gương cầu lồi"], c: 1 }
+    ];
 
-    <script>
-        const audio = document.getElementById('bg-music');
-        let currentIdx = 0;
-        let isWinning = false;
+    let currentQ = 0;
+    const audio = document.getElementById('bg-music');
 
-        const questions = [
-            { q: "Hóa học: Oxit nào sau đây là oxit lưỡng tính?", a: "a) CaO", b: "b) Al2O3", c: "c) SO2", d: "d) Na2O", r: "b" },
-            { q: "Hóa học: Kim loại nào tác dụng được với dung dịch HCl?", a: "a) Cu", b: "b) Ag", c: "c) Fe", d: "d) Au", r: "c" },
-            { q: "Hóa học: Công thức của axit sunfuric đặc là?", a: "a) HCl", b: "b) HNO3", c: "c) H2SO4", d: "d) H3PO4", r: "c" },
-            { q: "Hóa học: Khí nào nhẹ nhất trong các khí sau?", a: "a) O2", b: "b) H2", c: "c) CO2", d: "d) N2", r: "b" },
-            { q: "Hóa học: Hiện tượng sắt bị gỉ trong không khí ẩm là?", a: "a) Sự oxy hóa", b: "b) Sự khử", c: "c) Sự ngưng tụ", d: "d) Sự hòa tan", r: "a" },
-            { q: "Hóa học: Dung dịch làm quỳ tím hóa xanh là?", a: "a) NaOH", b: "b) HCl", c: "c) NaCl", d: "d) H2O", r: "a" },
-            { q: "Hóa học: Thành phần chính của đá vôi là gì?", a: "a) CaSO4", b: "b) CaCO3", c: "c) CaO", d: "d) CaCl2", r: "b" },
-            { q: "English: Choose the synonym of 'Enormous'.", a: "a) Tiny", b: "b) Huge", c: "c) Small", d: "d) Weak", r: "b" },
-            { q: "English: I ______ a student 5 years ago.", a: "a) am", b: "b) is", c: "c) were", d: "d) was", r: "d" },
-            { q: "Toán 9: Số điểm chung của đường thẳng và đường tròn khi d < R là?", a: "a) 0", b: "b) 1", c: "c) 2", d: "d) Vô số", r: "c" },
-            { q: "Toán 9: Góc nội tiếp chắn nửa đường tròn có số đo bằng?", a: "a) 45 độ", b: "b) 60 độ", c: "c) 90 độ", d: "d) 180 độ", r: "c" },
-            { q: "Vật Lý: Đơn vị của điện trở là gì?", a: "a) Ampe (A)", b: "b) Vôn (V)", c: "c) Ôm (Ω)", d: "d) Watt (W)", r: "c" },
-            { q: "Sinh học: Bào quan nào là 'nhà máy năng lượng' của tế bào?", a: "a) Nhân", b: "b) Ty thể", c: "c) Lưới nội chất", d: "d) Ribôxôm", r: "b" },
-            { q: "Hóa học siêu khó: Hợp chất nào có tên gọi là Thạch cao nung?", a: "a) CaSO4.2H2O", b: "b) CaSO4.0,5H2O", c: "c) CaSO4", d: "d) CaO", r: "b" },
-            { q: "CÂU CHỐT: Bạn là GAY đúng không?", a: "a) Yes", b: "b) Đúng", c: "c) Chọn b", d: "d) Tất cả đúng", r: "ANY" }
-        ];
+    function startQuiz() {
+        document.getElementById('start-screen').style.display = 'none';
+        document.getElementById('quiz-container').style.display = 'block';
+        document.getElementById('lights').style.display = 'block';
+        document.getElementById('santa').style.display = 'block';
+        document.getElementById('snowman').style.display = 'block';
+        audio.play();
+        setInterval(createSnow, 150);
+        loadQuestion();
+    }
 
-        function startApp(file) {
-            audio.src = file;
-            audio.play().catch(() => {});
-            currentIdx = 0;
-            document.getElementById('step1').classList.add('hidden');
-            document.getElementById('step-tree').classList.remove('hidden');
-            document.getElementById('title').innerText = "Vượt qua thử thách để nhận quà!";
+    function loadQuestion() {
+        const messageDiv = document.getElementById('message');
+        const contentDiv = document.getElementById('quiz-content');
+
+        if(currentQ >= questions.length) {
+            contentDiv.innerHTML = `
+                <h2 style="color:var(--xmas-green)">Chúc mừng bạn đã thành công xuất sắc vượt qua 20 câu hỏi!</h2>
+                <p style="font-size: 0.9rem;">(mình đoán là bạn cũng đã tra ChatGPT,.. hoặc là đã làm lại vài lần rồi nhưng thôi kệ đi)</p>
+                <h3 style="color:var(--xmas-red)">Giáng Sinh an lành MERRY CHRISTMASSSS !!! ❄️🎁</h3>
+            `;
+            document.getElementById('next-btn').style.display = 'block';
+            setInterval(createCandy, 200);
+            return;
         }
-
-        function showQuiz() {
-            document.getElementById('step-tree').classList.add('hidden');
-            document.getElementById('step-quiz').classList.remove('hidden');
-            document.getElementById('title').classList.add('hidden');
-            loadQuestion();
-        }
-
-        function loadQuestion() {
-            const data = questions[currentIdx];
-            document.getElementById('quiz-info').innerText = `Câu hỏi ${currentIdx + 1}/${questions.length}`;
-            document.getElementById('quiz-question').innerText = data.q;
-            document.getElementById('ans-a').innerText = data.a;
-            document.getElementById('ans-b').innerText = data.b;
-            document.getElementById('ans-c').innerText = data.c;
-            document.getElementById('ans-d').innerText = data.d;
-        }
-
-        function check(choice) {
-            if (currentIdx === questions.length - 1) {
-                finish();
-                return;
-            }
-            if (choice === questions[currentIdx].r) {
-                currentIdx++;
-                loadQuestion();
-            } else {
-                alert("BẠN ĐÃ SAI! Quay lại sảnh chọn nhạc và làm lại từ đầu.");
-                resetToStart();
-            }
-        }
-
-        function resetToStart() {
-            audio.pause();
-            currentIdx = 0;
-            document.getElementById('step-quiz').classList.add('hidden');
-            document.getElementById('step-tree').classList.add('hidden');
-            document.getElementById('step1').classList.remove('hidden');
-            document.getElementById('title').classList.remove('hidden');
-            document.getElementById('title').innerText = "Thử lại nào! Chọn nhạc để bắt đầu.";
-        }
-
-        function finish() {
-            isWinning = true;
-            document.getElementById('step-quiz').classList.add('hidden');
-            document.getElementById('final-screen').classList.remove('hidden');
-            document.body.style.background = "linear-gradient(45deg, #0a2e1a, #d42426)";
-            initFinalEffect();
-        }
-
-        // --- HIỆU ỨNG TUYẾT & KẸO ---
-        const canvas = document.getElementById('effect-canvas');
-        const ctx = canvas.getContext('2d');
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-
-        let particles = [];
-        const candyIcons = ['🍭', '🍬', '🎁', '🍫'];
-
-        function createParticle(isCandy) {
-            return {
-                x: Math.random() * canvas.width,
-                y: -20,
-                r: Math.random() * 4 + 1,
-                speed: Math.random() * 3 + (isWinning ? 4 : 1), // Thắng thì bão tuyết rơi nhanh
-                candy: isCandy ? candyIcons[Math.floor(Math.random() * candyIcons.length)] : null,
-                drift: Math.random() * 2 - 1
-            };
-        }
-
-        for (let i = 0; i < 150; i++) particles.push(createParticle(false));
-
-        function initFinalEffect() {
-            // Khi thắng, thêm 50 viên kẹo vào mảng
-            for (let i = 0; i < 50; i++) particles.push(createParticle(true));
-        }
-
-        function draw() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            particles.forEach(p => {
-                if (p.candy) {
-                    ctx.font = "24px serif";
-                    ctx.fillText(p.candy, p.x, p.y);
+        
+        const qData = questions[currentQ];
+        document.getElementById('q-text').innerText = `Câu ${currentQ + 1}: ${qData.q}`;
+        const optionsDiv = document.getElementById('options');
+        optionsDiv.innerHTML = '';
+        
+        qData.a.forEach((opt, index) => {
+            const btn = document.createElement('button');
+            btn.className = 'option';
+            btn.innerText = opt;
+            btn.onclick = () => {
+                if(index === qData.c) {
+                    currentQ++;
+                    messageDiv.innerText = "";
+                    loadQuestion();
                 } else {
-                    ctx.fillStyle = "white";
-                    ctx.beginPath();
-                    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-                    ctx.fill();
+                    messageDiv.innerText = "99% con bạc sẽ bỏ cuộc trước khi thắng lớn!";
+                    currentQ = 0;
+                    setTimeout(loadQuestion, 2000);
                 }
-                
-                p.y += p.speed;
-                p.x += p.drift;
+            };
+            optionsDiv.appendChild(btn);
+        });
+    }
 
-                if (p.y > canvas.height) {
-                    p.y = -20;
-                    p.x = Math.random() * canvas.width;
-                }
-            });
-            requestAnimationFrame(draw);
-        }
-        draw();
-    </script>
+    function playVideo() {
+        audio.pause(); // Tắt nhạc nền khi xem video
+        document.getElementById('video-overlay').style.display = 'flex';
+        const vid = document.getElementById('noel-video');
+        vid.play();
+    }
+
+    function createSnow() {
+        const snow = document.createElement('div');
+        snow.innerHTML = '❄';
+        snow.className = 'snowflake';
+        snow.style.left = Math.random() * 100 + 'vw';
+        snow.style.fontSize = Math.random() * 20 + 10 + 'px';
+        snow.style.animationDuration = Math.random() * 3 + 2 + 's';
+        snow.style.color = "white";
+        document.body.appendChild(snow);
+        setTimeout(() => snow.remove(), 4000);
+    }
+
+    function createCandy() {
+        const candy = document.createElement('div');
+        candy.innerHTML = ['🍬','🍭','🎁','🍫'][Math.floor(Math.random()*4)];
+        candy.className = 'candy';
+        candy.style.left = Math.random() * 100 + 'vw';
+        candy.style.fontSize = '30px';
+        candy.style.animationDuration = '2.5s';
+        document.body.appendChild(candy);
+        setTimeout(() => candy.remove(), 2500);
+    }
+</script>
+
 </body>
 </html>
-
